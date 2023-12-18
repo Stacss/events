@@ -16,7 +16,7 @@
                     "Аутентификация"
                 ],
                 "summary": "Регистрация нового пользователя",
-                "description": "Регистрирует нового пользователя с предоставленным именем, email и паролем",
+                "description": "Регистрирует нового пользователя с предоставленным логином, email, паролем, и датой рождения (необязательно), а также именем и фамилией.",
                 "operationId": "a718f172ff3ac464d723835815f8fb57",
                 "requestBody": {
                     "required": true,
@@ -26,7 +26,9 @@
                                 "required": [
                                     "login",
                                     "email",
-                                    "password"
+                                    "password",
+                                    "first_name",
+                                    "last_name"
                                 ],
                                 "properties": {
                                     "login": {
@@ -42,6 +44,20 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "password123"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01",
+                                        "nullable": true
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Ivan"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Petrov"
                                     }
                                 },
                                 "type": "object"
@@ -56,11 +72,11 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
+                                        "error": {
                                             "type": "string",
-                                            "example": "Пользователь успешно зарегистрирован"
+                                            "example": "null"
                                         },
-                                        "user": {
+                                        "result": {
                                             "$ref": "/docs/swagger.yaml#/components/schemas/User"
                                         }
                                     },
@@ -75,17 +91,17 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Переданы некорректные данные."
-                                        },
                                         "errors": {
                                             "type": "object",
                                             "example": {
                                                 "email": [
-                                                    "Поле email обязательно для заполнения."
+                                                    "The login has already been taken."
                                                 ]
                                             }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Переданы некорректные данные."
                                         }
                                     },
                                     "type": "object"

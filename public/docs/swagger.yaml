@@ -6,11 +6,20 @@ components:
         id:
           type: integer
           format: int64
-        name:
+        login:
           type: string
         email:
           type: string
           format: email
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
         created_at:
           type: string
           format: date-time

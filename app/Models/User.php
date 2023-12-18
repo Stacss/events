@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,6 +22,8 @@ class User extends Authenticatable
         'login',
         'email',
         'password',
+        'first_name',
+        'last_name',
         'date_of_birth',
     ];
 
