@@ -42,6 +42,8 @@ return [
                     base_path('app'),
                 ],
 
+                base_path('public/docs/swagger.yaml'),
+
             ],
         ],
     ],
