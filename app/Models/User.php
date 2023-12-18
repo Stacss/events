@@ -13,20 +13,21 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Атрибуты, которые можно массово присваивать.
      *
-     * @var array<int, string>
+     * @var array<string>
      */
     protected $fillable = [
-        'name',
+        'login',
         'email',
         'password',
+        'date_of_birth',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Атрибуты, которые скрыты при сериализации.
      *
-     * @var array<int, string>
+     * @var array<string>
      */
     protected $hidden = [
         'password',
@@ -34,11 +35,31 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Атрибуты, которые приводятся к определенному типу данных.
      *
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'date_of_birth' => 'date',
     ];
+
+    /**
+     * Accessor для получения отформатированной даты рождения.
+     *
+     * @param  mixed  $value
+     * @return string|null
+     */
+    public function getDateOfBirthAttribute($value) {
+        return $value ? Carbon::parse($value)->format('Y-m-d') : null; // Форматируем дату при обращении к атрибуту
+    }
+
+    /**
+     * Mutator для установки значения атрибута даты рождения.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setDateOfBirthAttribute($value) {
+        $this->attributes['date_of_birth'] = $value ? Carbon::parse($value) : null; // Устанавливаем значение атрибута в формате Carbon
+    }
 }
