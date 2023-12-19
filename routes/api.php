@@ -23,5 +23,10 @@ Route::post('/register', [AuthApiController::class, 'register']);
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/events', [EventApiController::class, 'create']);
 Route::middleware('auth:sanctum')->get('/events', [EventApiController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/events/{eventId}/join', [EventApiController::class, 'joinEvent']);
+Route::middleware('auth:sanctum')->delete('/events/{eventId}/cancel-participation', [EventApiController::class, 'cancelEventParticipation']);
+Route::middleware('auth:sanctum')->delete('/events/{eventId}/delete', [EventApiController::class, 'deleteEvent']);
+
+
 
 

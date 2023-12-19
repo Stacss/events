@@ -14,7 +14,7 @@ use Illuminate\Routing\Controller as BaseController;
  *      description="API управления Событиями проекта",
  *      @OA\Contact(
  *          email="postnikov.sa@ya.ru",
- *          name="Stanoslav"
+ *          name="Stanislav"
  *      )
  * )
  */

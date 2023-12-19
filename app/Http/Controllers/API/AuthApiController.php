@@ -81,7 +81,7 @@ class AuthApiController extends Controller
      *      path="/api/login",
      *      tags={"Пользователи"},
      *      summary="Авторизация пользователя",
-     *      description="Авторизует пользователя на основе предоставленных учетных данных",
+     *      description="Авторизует пользователя на основе предоставленных учетных данных, и выдает токен для дальнейшего взаимодействия",
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(

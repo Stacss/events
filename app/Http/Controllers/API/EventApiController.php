@@ -5,8 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class EventApiController extends Controller
@@ -189,6 +189,358 @@ class EventApiController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => 'Ошибка при получении списка событий',
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/events/{eventId}/join",
+     *      operationId="joinEvent",
+     *      tags={"События"},
+     *      summary="Участие в событии",
+     *      description="Присоединение к событию для авторизованного пользователя",
+     *      security={ {"bearerAuth": {} }},
+     *      @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer {token}",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="Accept",
+     *          in="header",
+     *          required=true,
+     *          description="application/json",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="eventId",
+     *          in="path",
+     *          required=true,
+     *          description="ID события",
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int64"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Успешное участие в событии",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="null"
+     *              ),
+     *              @OA\Property(
+     *                  property="result",
+     *                  type="string",
+     *                  example="Вы успешно присоединились к событию"
+     *              ),
+     *              @OA\Property(
+     *                  property="event",
+     *                  ref="/docs/swagger.yaml#/components/schemas/Event"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Неверный запрос",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Вы уже участвуете в этом событии"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Ошибка аутентификации",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Unauthenticated"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Ошибка сервера",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Ошибка сервера: текст_ошибки"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function joinEvent(Request $request, $eventId)
+    {
+        try {
+            $event = Event::findOrFail($eventId);
+
+            if ($event->participants->contains(auth()->user()->id)) {
+                return response()->json([
+                    'error' => 'Вы уже участвуете в этом событии'
+                ], 400);
+            }
+
+            // Добавление пользователя в список участников события
+            $event->participants()->attach(auth()->user()->id);
+
+            return response()->json([
+                'error' => null,
+                'result' => 'Вы успешно присоединились к событию',
+                'event' => $event
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Событие не найдено'
+            ],
+                404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Ошибка сервера: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     *      path="/api/events/{eventId}/cancel-participation",
+     *      operationId="cancelEventParticipation",
+     *      tags={"События"},
+     *      summary="Отмена участия в событии",
+     *      description="Отмена участия в событии для авторизованного пользователя",
+     *      security={ {"bearerAuth": {} }},
+     *      @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer {token}",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="Accept",
+     *          in="header",
+     *          required=true,
+     *          description="application/json",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="eventId",
+     *          in="path",
+     *          required=true,
+     *          description="ID события",
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int64"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Успешная отмена участия в событии",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="null"
+     *              ),
+     *              @OA\Property(
+     *                  property="result",
+     *                  type="string",
+     *                  example="Участие в событии успешно отменено"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Неверный запрос",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Вы не участвуете в этом событии"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Ошибка аутентификации",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Unauthenticated"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Ошибка сервера",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Ошибка сервера: текст_ошибки"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function cancelEventParticipation($eventId)
+    {
+        try {
+            $event = Event::findOrFail($eventId);
+
+            if (!$event->participants()->detach(auth()->user()->id)) {
+                return response()->json([
+                    'error' => 'Вы не участвуете в этом событии'
+                ], 400);
+            }
+
+            return response()->json([
+                'error' => null,
+                'result' => 'Участие в событии успешно отменено'
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Событие не найдено'
+            ],
+                404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Ошибка сервера: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     *      path="/api/events/{eventId}",
+     *      operationId="deleteEvent",
+     *      tags={"События"},
+     *      summary="Удаление события",
+     *      description="Удаление события создателем",
+     *      security={ {"bearerAuth": {} }},
+     *      @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer {token}",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="Accept",
+     *          in="header",
+     *          required=true,
+     *          description="application/json",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="eventId",
+     *          in="path",
+     *          required=true,
+     *          description="ID события",
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int64"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Событие успешно удалено",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="null"
+     *              ),
+     *              @OA\Property(
+     *                  property="result",
+     *                  type="string",
+     *                  example="Событие успешно удалено"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Ошибка доступа",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Вы не можете удалить это событие, так как не являетесь его создателем"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Событие не найдено",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Событие не найдено"
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Ошибка сервера",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="Ошибка сервера: текст_ошибки"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function deleteEvent($eventId)
+    {
+        try {
+            $event = Event::findOrFail($eventId);
+
+            if ($event->creator_id !== auth()->user()->id) {
+                return response()->json([
+                    'error' => 'Вы не можете удалить это событие, так как не являетесь его создателем'
+                ], 403);
+            }
+
+            $event->delete();
+
+            return response()->json([
+                'error' => null,
+                'result' => 'Событие успешно удалено'
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Событие не найдено'
+            ],
+            404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Ошибка сервера: ' . $th->getMessage()
             ], 500);
         }
     }
