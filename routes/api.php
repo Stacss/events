@@ -22,4 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthApiController::class, 'register']);
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/events', [EventApiController::class, 'create']);
+Route::middleware('auth:sanctum')->get('/events', [EventApiController::class, 'index']);
+
 
