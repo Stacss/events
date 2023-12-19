@@ -94,7 +94,7 @@ class AuthApiController extends Controller
      *          response=200,
      *          description="Успешная авторизация",
      *          @OA\JsonContent(
-     *              @OA\Property(property="error", type="null"),
+     *              @OA\Property(property="error", type="string", example="null"),
      *              @OA\Property(property="result", type="string", example="Успешная авторизация"),
      *              @OA\Property(property="token", type="string")
      *          )
