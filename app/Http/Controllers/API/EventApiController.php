@@ -48,7 +48,8 @@ class EventApiController extends Controller
      *          response=201,
      *          description="Событие успешно создано",
      *          @OA\JsonContent(
-     *              @OA\Property(property="error", type="null"),
+     *              @OA\Property(property="error", type="string",
+     *                  example="null"),
      *              @OA\Property(
      *                  property="result",
      *                  ref="/docs/swagger.yaml#/components/schemas/Event"
@@ -114,6 +115,80 @@ class EventApiController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/events",
+     *      operationId="getEventsList",
+     *      tags={"События"},
+     *      summary="Получение списка событий",
+     *      description="Возвращает список событий для аутентифицированного пользователя которые он создал",
+     *      security={ {"bearerAuth": {} }},
+     *     @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer {token}",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="Accept",
+     *          in="header",
+     *          required=true,
+     *          description="application/json",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Успешное выполнение",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="error",
+     *                  type="string",
+     *                  example="null"
+     *              ),
+     *              @OA\Property(
+     *                  property="events",
+     *                  type="array",
+     *                  @OA\Items(ref="/docs/swagger.yaml#/components/schemas/Event")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Ошибка авторизации",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Unauthenticated")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Ошибка сервера",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Ошибка сервера")
+     *          )
+     *      )
+     * )
+     */
+    public function index()
+    {
+        try {
+            $events = Event::where('creator_id', auth()->id())->get();
+
+            return response()->json([
+                'error' => null,
+                'events' => $events,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Ошибка при получении списка событий',
             ], 500);
         }
     }
