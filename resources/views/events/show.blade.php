@@ -35,7 +35,7 @@
                     <li style="list-style-type: none">
 
                         <button data-toggle="modal" data-target="#userModal{{ $loop->index }}" class="btn btn-light">
-                            <i class="fas fa-user text-red"></i>
+                            <i class="fas fa-user text-green"></i>
                         </button>
 
                         {{ $participant->first_name }} {{ $participant->last_name }}
