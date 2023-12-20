@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Event;
+use App\Services\MenuBuilder;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -26,43 +27,10 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(Dispatcher $events)
+    public function boot(MenuBuilder $menuBuilder)
     {
         Schema::defaultStringLength(191);
 
-        $events->listen(BuildingMenu::class, function (BuildingMenu $event) {
-            $menus = Event::all();
-
-            foreach($menus as $menu){
-                $arrayMenu[] = array(
-                    'text' => $menu->title,
-                    'url' => $menu->id,
-                    'icon' => 'fas fa-genderless',
-                );
-            }
-
-            $myEvents = Event::where('creator_id', Auth::user()->id)->get();
-
-            foreach($myEvents as $myEvent){
-                $arrayMenuEvent[] = array(
-                    'text' => $myEvent->title,
-                    'url' => $myEvent->id,
-                    'icon' => 'fas fa-genderless',
-                );
-            }
-            $event->menu->add([
-                'header' => 'Привет, ' . Auth::user()->first_name . '!',
-                ]);
-
-            $event->menu->add(['text' => 'Все События',
-                'icon' => 'fas fa-fw fa-share',
-                'submenu' => $arrayMenu,]);
-
-            $event->menu->add(['text' => 'Мои События',
-                'icon' => 'fas fa-fw fa-share',
-                'submenu' => $arrayMenuEvent,]);
-        });
-
-
+        $menuBuilder->listenBuildingMenu();
     }
 }
