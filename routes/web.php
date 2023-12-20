@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Web\EventController;
 use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Auth\LoginController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,9 +16,7 @@ use App\Http\Controllers\Web\HomeController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Auth::routes();
 
@@ -28,3 +27,5 @@ Route::get('/events/{eventId}', [EventController::class, 'show'])->name('event.s
 Route::delete('/events/{eventId}/participants/{userId}', [EventController::class, 'removeParticipant'])->name('event.removeParticipant');
 
 Route::get('/events/{eventId}/join', [EventController::class, 'joinEvent'])->name('events.join');
+
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
