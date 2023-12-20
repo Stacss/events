@@ -66,6 +66,10 @@ class MenuBuilderService
 
             $event->menu->add([
                 'header' => 'Привет, ' . Auth::user()->first_name . '!',
+            ],[
+                'text' => 'выход',
+                'icon' => 'fas fa-sign-out-alt',
+                'url' => route('logout'),
             ]);
 
             $event->menu->add([
