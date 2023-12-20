@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Event;
-use App\Services\MenuBuilder;
+use App\Services\MenuBuilderService;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(MenuBuilder $menuBuilder)
+    public function boot(MenuBuilderService $menuBuilder)
     {
         Schema::defaultStringLength(191);
 
