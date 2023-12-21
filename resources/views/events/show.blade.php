@@ -100,6 +100,11 @@
 
     </div>
 
+    <script>
+        setInterval(function() {
+            location.reload(true);
+        }, 30000);
+    </script>
 
 
 @endsection
